@@ -1,0 +1,83 @@
+import data from "../../assets/accordianData";
+import { useState } from "react";
+import cn from "../../useCn";
+
+export default function Accordian() {
+  const [selected, setSelected] = useState(null);
+  const [isMulti, setIsMulti] = useState(false);
+  const[allSelected,setAllSelected]=useState([])
+  function toggleMulti() {
+    setIsMulti((x) => !x);
+  }
+  function handleClick(id) {
+    console.log(id);
+    if(isMulti){
+      const copy = [...allSelected]
+      if(copy.indexOf(id)!==-1){
+        copy.splice(copy.indexOf(id),1)
+      }else{
+        copy.push(id)
+      }
+      setAllSelected(copy)
+    }else{
+      setSelected(selected === id ? null : id);
+    }
+  }
+  return (
+    <>
+      <div className="wrapper  bg-green-300 p-3">
+        <div className="accordian container bg-blue-300 p-3 ">
+          <div className="flex justify-between">
+            <h1 className="text-center text-3xl font-bold py-3 bg-pink-600 flex-grow">
+              Accordian
+            </h1>
+            <button
+              className={cn(
+                " px-2 py-1 relative z-10",
+                isMulti ? "bg-red-400" : "bg-green-600"
+              )}
+              onClick={toggleMulti}
+            >
+              {isMulti ? "Disable" : "Enable"}
+              Multiple Selection
+            </button>
+          </div>
+          <div className={cn("isMulti-status bg-sky-200 text-center text-lg font-semibold",
+            isMulti ? "text-green-600" : "text-red-400"
+          )}>Multi is
+            {
+              isMulti ? " ON" : " OFF"
+            }
+
+          </div>
+          {data && data.length ? (
+            data.map((item, index) => {
+              return (
+                <div className="single-acc-item bg-red-200 p-3" key={item.id}>
+                  <div className="flex justify-between items-center cursor-pointer" onClick={() => handleClick(item.id)}>
+                  <h3
+                    className="inline-flex bg-yellow-300"
+                    >
+                    {item.question}
+                  </h3>
+                  <span className="text-3xl">{selected === item.id ? "-" : "+"}</span>
+                    </div>
+                  <h4
+                    className={cn(
+                      "bg-sky-300 transition-all duration-1000 hidden",
+                      (!isMulti && selected === item.id) || (isMulti && allSelected.indexOf(item.id)!==-1) ? "block" : null
+                    )}
+                  >
+                    {item.answer}
+                  </h4>
+                </div>
+              );
+            })
+          ) : (
+            <div className="error-div">No Data Found</div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
